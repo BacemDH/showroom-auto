@@ -1,0 +1,143 @@
+<section class="catalog">
+  <div class="catalog-heading">
+    <div>
+      <p class="eyebrow">Explore our collection</p>
+      <h2>Find your next car</h2>
+    </div>
+    <p class="result-count" aria-live="polite">{{selectedAutos.length}} cars</p>
+  </div>
+
+  <div class="catalog-toolbar">
+    <div class="search-panel">
+      <fa-icon [icon]="faMagnifyingGlass" aria-hidden="true"></fa-icon>
+      <label class="visually-hidden" for="car-search">Search by brand or model</label>
+      <input
+        id="car-search"
+        #search
+        type="search"
+        placeholder="Search by brand or model..."
+        [value]="searchTerm"
+        (input)="onSearchInput(search.value)"
+      />
+      @if(searchTerm) {
+        <button class="clear-search" type="button" (click)="clearSearch()">Clear</button>
+      }
+    </div>
+
+    <button
+      class="favorites-toggle"
+      type="button"
+      [class.is-on]="showFavorites"
+      [attr.aria-pressed]="showFavorites"
+      [attr.aria-label]="(showFavorites ? 'Hide' : 'Show') + ' my favorites list'"
+      [title]="showFavorites ? 'Hide favorites list' : 'Show favorites list'"
+      (click)="toggleFavorites()"
+    >
+      <fa-icon [icon]="faHeart" aria-hidden="true"></fa-icon>
+      <span class="favorites-toggle-label">Favorites</span>
+      @if(favoritesCount) {
+        <span class="favorites-toggle-count">{{favoritesCount}}</span>
+      }
+    </button>
+  </div>
+
+  <div class="filters" role="group" aria-label="Filter cars">
+    <p class="filters-title">
+      <fa-icon [icon]="faSliders" aria-hidden="true"></fa-icon>
+      Filters
+    </p>
+
+    <div class="filter">
+      <label for="filter-brand">Brand</label>
+      <select id="filter-brand" (change)="onBrandChange($event)">
+        <option value="" [selected]="brand === ''">All brands</option>
+        @for(b of brands; track b) {
+          <option [value]="b" [selected]="b === brand">{{b}}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter">
+      <label for="filter-sort">Sort by</label>
+      <select id="filter-sort" (change)="onSortChange($event)">
+        <option value="default" [selected]="sortBy === 'default'">Recommended</option>
+        <option value="price-asc" [selected]="sortBy === 'price-asc'">Price: low to high</option>
+        <option value="price-desc" [selected]="sortBy === 'price-desc'">Price: high to low</option>
+        <option value="power-desc" [selected]="sortBy === 'power-desc'">Power: high to low</option>
+      </select>
+    </div>
+
+    <div class="filter">
+      <label for="filter-price">Max price (DNT)</label>
+      <input
+        id="filter-price"
+        #priceInput
+        type="number"
+        inputmode="numeric"
+        min="0"
+        step="1"
+        [value]="maxPriceInput"
+        [placeholder]="'Any up to ' + priceCeil"
+        (input)="onMaxPriceInput(priceInput.value)"
+      />
+    </div>
+
+    <div class="filter">
+      <label for="filter-power">Min power (CV)</label>
+      <input
+        id="filter-power"
+        #powerInput
+        type="number"
+        inputmode="numeric"
+        min="0"
+        step="1"
+        [value]="minPowerInput"
+        [placeholder]="'Any from ' + powerFloor + ' CV'"
+        (input)="onMinPowerInput(powerInput.value)"
+      />
+    </div>
+
+    @if(hasActiveFilters) {
+      <button class="reset-filters" type="button" (click)="resetFilters()">Reset filters</button>
+    }
+  </div>
+
+  @if(selectedAutos.length) {
+    <div class="container">
+      @for(auto of selectedAutos; track auto.id) {
+        <article class="auto-card">
+          <div class="photo-wrap">
+            <img [src]="'images/' + auto.photo" [alt]="auto.brand + ' ' + auto.model" loading="lazy">
+            <button
+              class="fav-btn"
+              type="button"
+              [class.is-fav]="isFavorite(auto)"
+              [attr.aria-pressed]="isFavorite(auto)"
+              [attr.aria-label]="(isFavorite(auto) ? 'Remove ' : 'Add ') + auto.brand + ' ' + auto.model + (isFavorite(auto) ? ' from' : ' to') + ' favorites'"
+              [title]="isFavorite(auto) ? 'Remove from favorites' : 'Add to favorites'"
+              (click)="toggleFavorite(auto)"
+            >
+              <fa-icon [icon]="faHeart" aria-hidden="true"></fa-icon>
+            </button>
+          </div>
+          <div class="details">
+            <p class="card-brand">{{auto.brand}}</p>
+            <h3>{{auto.model}}</h3>
+            <p class="specs">
+              <span>{{auto.power}} CV</span>
+              <span>{{auto.availability}} en stock</span>
+            </p>
+            <p class="price">{{auto.price}} <span>DNT</span></p>
+            <button class="see-more" type="button" (click)="selectCar(auto)">See more <span aria-hidden="true">→</span></button>
+          </div>
+        </article>
+      }
+    </div>
+  } @else {
+    <div class="empty-state" role="status">
+      <h3>No cars found</h3>
+      <p>Try another brand or model, or reset your filters.</p>
+      <button class="see-more" type="button" (click)="resetFilters()">Show all cars</button>
+    </div>
+  }
+</section>

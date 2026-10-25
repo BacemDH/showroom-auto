@@ -1,0 +1,14 @@
+<div class ="header-bar">
+  <button
+    class="theme-toggle"
+    type="button"
+    [attr.aria-pressed]="theme === 'dark'"
+    [attr.aria-label]="theme === 'dark' ? 'Switch to light mode' : 'Switch to night mode'"
+    [title]="theme === 'dark' ? 'Light mode' : 'Night mode'"
+    (click)="toggleTheme.emit()"
+  >
+    <fa-icon class="theme-toggle-icon" [icon]="theme === 'dark' ? faSun : faMoon" aria-hidden="true"></fa-icon>
+    <span class="theme-toggle-label">{{ theme === 'dark' ? 'Light mode' : 'Night mode' }}</span>
+  </button>
+  <h1>Welcome to my showroom! </h1>
+</div>

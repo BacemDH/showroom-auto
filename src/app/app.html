@@ -1,0 +1,103 @@
+<app-head-bar [theme]="theme" (toggleTheme)="toggleTheme()"> </app-head-bar>
+
+@if(showFavorites) {
+    <section class="favorites" aria-label="My favorite cars">
+        <div class="favorites-heading">
+            <h2>
+                My favorites
+                <span class="favorites-count">{{favorites.length}}</span>
+            </h2>
+            <button class="favorites-hide" type="button" (click)="toggleFavorites()">Hide</button>
+        </div>
+
+        @if(favorites.length) {
+            <ul class="favorites-list">
+                @for(auto of favorites; track auto.id) {
+                    <li class="favorite-card">
+                        <img [src]="'images/' + auto.photo" [alt]="auto.brand + ' ' + auto.model" loading="lazy">
+                        <div class="favorite-info">
+                            <p class="favorite-brand">{{auto.brand}}</p>
+                            <h3>{{auto.model}}</h3>
+                            <p class="favorite-price">{{auto.price}} <span>DNT</span></p>
+                        </div>
+                        <div class="favorite-actions">
+                            <button class="favorite-view" type="button" (click)="handleSelectCar(auto)">Details</button>
+                            <button
+                                class="favorite-remove"
+                                type="button"
+                                [attr.aria-label]="'Remove ' + auto.brand + ' ' + auto.model + ' from favorites'"
+                                title="Remove from favorites"
+                                (click)="removeFavorite(auto)"
+                            >×</button>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <button class="favorites-clear" type="button" (click)="clearFavorites()">Clear all favorites</button>
+        } @else {
+            <p class="favorites-empty">
+                No favorites yet — tap the heart on any car to save it here.
+            </p>
+        }
+    </section>
+}
+
+<app-search-bar
+    [autos]="autoList"
+    [favorites]="favorites"
+    [favoritesCount]="favorites.length"
+    [showFavorites]="showFavorites"
+    (onSelectCar)="handleSelectCar($event)"
+    (onToggleFavorite)="toggleFavorite($event)"
+    (onToggleFavorites)="toggleFavorites()"
+> </app-search-bar>
+
+<section
+    class="car-modal"
+    [class.is-open]="detailsOpen"
+    (click)="clearSelectedCar()"
+    (document:keydown.escape)="clearSelectedCar()"
+>
+    @if(selectedCar){
+        <div
+            class="modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="car-modal-title"
+            (click)="$event.stopPropagation()"
+        >
+            <button class="description-close" type="button" aria-label="Close car details" (click)="clearSelectedCar()">×</button>
+            <img class="description-photo" [src]="'images/' + selectedCar.photo" [alt]="selectedCar.brand + ' ' + selectedCar.model">
+            <div class="modal-body">
+                <h2 id="car-modal-title">{{selectedCar.brand}} {{selectedCar.model}}</h2>
+
+                <ul class="modal-specs">
+                    <li class="modal-spec">
+                        <span class="modal-spec-value">{{selectedCar.power}} <span class="modal-spec-unit">CV</span></span>
+                        <span class="modal-spec-label">Horsepower</span>
+                    </li>
+                    <li class="modal-spec">
+                        <span class="modal-spec-value">{{selectedCar.price}} <span class="modal-spec-unit">DNT</span></span>
+                        <span class="modal-spec-label">Price</span>
+                    </li>
+                    <li class="modal-spec">
+                        <span class="modal-spec-value">{{selectedCar.availability}} <span class="modal-spec-unit">units</span></span>
+                        <span class="modal-spec-label">Available</span>
+                    </li>
+                </ul>
+
+                <p>{{selectedCar.description}}</p>
+                <button
+                    class="modal-favorite"
+                    type="button"
+                    [class.is-on]="selectedIsFavorite"
+                    [attr.aria-pressed]="selectedIsFavorite"
+                    (click)="toggleFavorite(selectedCar)"
+                >
+                    <span class="modal-favorite-icon" aria-hidden="true">♥</span>
+                    {{ selectedIsFavorite ? 'Remove from my favorites' : 'Add to my favorites' }}
+                </button>
+            </div>
+        </div>
+    }
+</section>
